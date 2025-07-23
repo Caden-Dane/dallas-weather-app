@@ -21,9 +21,6 @@ const HOURLY_VARS = 'temperature_2m,precipitation_probability,wind_speed_10m';
 // Optional OpenAI integration. To enable, set USE_OPENAI to true and
 // specify your API key in the OPENAI_API_KEY constant. Leaving USE_OPENAI
 // false will make the assistant rely on a rule‑based responder instead.
-const USE_OPENAI = true;
-const OPENAI_API_KEY = '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';
-const OPENAI_MODEL = 'llama3-8b-8192'; // You can also try 'mixtral-8x7b-32768'
 
 
 // Chat history used for OpenAI integration. Only used when USE_OPENAI=true.
