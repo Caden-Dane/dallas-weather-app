@@ -21,9 +21,10 @@ const HOURLY_VARS = 'temperature_2m,precipitation_probability,wind_speed_10m';
 // Optional OpenAI integration. To enable, set USE_OPENAI to true and
 // specify your API key in the OPENAI_API_KEY constant. Leaving USE_OPENAI
 // false will make the assistant rely on a rule‑based responder instead.
-const USE_OPENAI = false;
-const OPENAI_API_KEY = '';
-const OPENAI_MODEL = 'gpt-3.5-turbo';
+const USE_OPENAI = true;
+const OPENAI_API_KEY = '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';
+const OPENAI_MODEL = 'llama3-8b-8192'; // You can also try 'mixtral-8x7b-32768'
+
 
 // Chat history used for OpenAI integration. Only used when USE_OPENAI=true.
 const chatHistory = [];
@@ -285,19 +286,17 @@ function formatDate(dateStr) {
  * @returns {Promise<string>} The assistant's reply
  */
 async function callOpenAI(message) {
-    // Build the system prompt summarizing the 7‑day forecast
     const systemMessage = {
         role: 'system',
-        content: `You are a helpful assistant specialized in Dallas, Texas weather. Use the following 7‑day forecast (in Fahrenheit) as context: ${JSON.stringify(weatherSummary)}. Answer the user\'s questions clearly and concisely.`,
+        content: `You are a helpful assistant specialized in Dallas, Texas weather. Use the following 7‑day forecast (in Fahrenheit) as context: ${JSON.stringify(weatherSummary)}. Answer the user's questions clearly and concisely.`,
     };
-    // Build the request body
     const body = {
         model: OPENAI_MODEL,
         messages: [systemMessage, ...chatHistory, { role: 'user', content: message }],
         temperature: 0.7,
     };
     try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -308,14 +307,14 @@ async function callOpenAI(message) {
         const result = await response.json();
         const content = result.choices && result.choices[0]?.message?.content?.trim();
         if (!content) {
-            throw new Error('No content returned from OpenAI');
+            throw new Error('No content returned from Groq');
         }
-        // Update chat history for context
         chatHistory.push({ role: 'user', content: message });
         chatHistory.push({ role: 'assistant', content });
         return content;
     } catch (error) {
-        console.error('OpenAI API error:', error);
-        return 'Sorry, there was an error contacting the AI service.';
+        console.error('Groq API error:', error);
+        return 'Sorry, there was an error contacting the Groq AI service.';
     }
 }
+
